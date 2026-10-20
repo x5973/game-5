@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Код Миллиона — Quiz Show</title>
+<style>
+:root{--bg:#090b14;--panel:#141827;--line:#303951;--cyan:#55f4e6;--pink:#ff4da6;--gold:#ffd477;--text:#f7f8ff;--muted:#a8b0c7}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 10% 0%,#6539a8 0,transparent 36%),radial-gradient(ellipse at 95% 15%,#006b7d 0,transparent 34%),radial-gradient(ellipse at 50% 100%,#5a174b 0,transparent 42%),#080b18;color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;padding:18px 13px 36px}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;background-image:linear-gradient(#9aa6ff18 1px,transparent 1px),linear-gradient(90deg,#9aa6ff18 1px,transparent 1px);background-size:32px 32px}
+.app{position:relative;max-width:1050px;margin:auto}
+header{text-align:center;margin:8px 0 22px}
+.logo{display:inline-flex;gap:9px;align-items:center;border:1px solid #55f4e644;background:#55f4e60b;border-radius:999px;padding:7px 12px;color:var(--cyan);font-weight:900;font-size:.72rem;letter-spacing:.18em}
+h1{font-size:clamp(2rem,7vw,4rem);letter-spacing:-.055em;margin:13px 0 5px;font-weight:950;background:linear-gradient(100deg,#fff35e,#62fff0 38%,#ff65c8 72%,#a58bff);color:transparent;background-clip:text}
+.subtitle{color:var(--muted);margin:0;font-size:.92rem}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:16px;align-items:start}
+.card{background:linear-gradient(145deg,#20294bec,#11172af5);border:1px solid var(--line);border-radius:23px;box-shadow:0 20px 55px #0006;overflow:hidden}
+.main-card{padding:clamp(14px,3vw,24px)}
+.topline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+.pill{font-size:.75rem;font-weight:800;letter-spacing:.07em;border:1px solid #ffffff1a;background:#ffffff08;border-radius:999px;padding:8px 11px;color:#dbe3ff}
+.pill b{color:var(--cyan)}
+.progress{height:5px;background:#ffffff0c;border-radius:9px;overflow:hidden;margin-bottom:20px}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--pink));transition:width .3s}
+.question-box{min-height:142px;display:grid;place-items:center;text-align:center;padding:22px 15px;margin-bottom:19px;border:1px solid #ff65c855;border-radius:19px;background:radial-gradient(ellipse at 15% 0,#ff65c822,transparent 50%),radial-gradient(ellipse at 85% 100%,#55f4e622,transparent 50%),#0c111e}
+.q-number{color:var(--cyan);font-size:.72rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px}
+.question{font-size:clamp(1.15rem,3.2vw,1.8rem);font-weight:800;line-height:1.35;max-width:720px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.answer{min-height:68px;text-align:left;display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #ffffff20;border-radius:15px;background:#ffffff07;color:var(--text);font:inherit;font-weight:700;cursor:pointer;transition:.17s}
+.answer .letter{width:31px;height:31px;flex:0 0 31px;display:grid;place-items:center;border-radius:10px;background:#55f4e612;color:var(--cyan);font-weight:950}
+.answer:hover:not(:disabled){transform:translateY(-2px);border-color:#55f4e6aa;background:#55f4e60c}
+.answer:disabled{cursor:default}.answer.correct{border-color:#57efaa;background:#1d654344;box-shadow:0 0 25px #57efaa14}.answer.correct .letter{background:#57efaa;color:#07170f}
+.answer.wrong{border-color:var(--pink);background:#8f245044;animation:shake .3s}.answer.wrong .letter{background:var(--pink);color:#220516}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.action-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.btn{border:1px solid #ffffff1c;border-radius:13px;background:#ffffff09;color:var(--text);font:inherit;font-weight:800;padding:12px 14px;cursor:pointer;transition:.15s}
+.btn:hover:not(:disabled){filter:brightness(1.2);transform:translateY(-1px)}.btn:disabled{opacity:.4;cursor:default}
+.btn.primary{background:linear-gradient(100deg,#087f87,#3d5acb);border:0;box-shadow:0 7px 18px #0d7c8a33}
+.btn.lifeline{flex:1;min-width:110px;color:#dce7ff}
+.message{margin-top:13px;min-height:24px;color:var(--muted);font-size:.9rem;text-align:center}
+.side{padding:17px}
+.side-title{font-size:.78rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;font-weight:900;margin:0 0 13px}
+.prize-list{display:flex;flex-direction:column-reverse;gap:5px}
+.prize{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:9px;color:#aeb7d0;font-size:.83rem;font-variant-numeric:tabular-nums}
+.prize .step{color:#68728d;font-size:.7rem;margin-right:9px}.prize.safe{color:var(--gold)}.prize.current{background:linear-gradient(90deg,#087f87aa,#3d5acb88);color:white;box-shadow:inset 0 0 0 1px #55f4e677}.prize.current .step{color:var(--cyan)}
+.side-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:17px}
+.side-controls .btn{font-size:.8rem;padding:11px 7px}
+.sound{margin-top:9px;width:100%;font-size:.82rem}
+.footer-note{color:#77819d;font-size:.76rem;line-height:1.55;text-align:center;margin:15px 6px 0}
+.overlay{display:none;position:fixed;inset:0;z-index:10;background:#050711d9;backdrop-filter:blur(9px);place-items:center;padding:20px}
+.overlay.show{display:grid}
+.modal{width:min(100%,440px);padding:27px 22px;border-radius:24px;text-align:center;border:1px solid #55f4e655;background:linear-gradient(145deg,#1b2236,#0e1220);box-shadow:0 25px 100px #0009}
+.modal .big{font-size:3rem}.modal h2{font-size:2rem;margin:8px 0;color:var(--gold)}.modal p{color:#c1c9df;line-height:1.5}
+@media(max-width:780px){.layout{grid-template-columns:1fr}.side{order:2}.prize-list{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.prize{padding:6px;font-size:.75rem}.prize .step{margin-right:4px}.side-title{margin-bottom:10px}}
+@media(max-width:480px){body{padding:12px 9px 25px}.answers{grid-template-columns:1fr;gap:8px}.answer{min-height:57px}.question-box{min-height:125px}.main-card{padding:12px}.topline{align-items:flex-start}.prize-list{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="logo">✦ ИНТЕЛЛЕКТ • РИСК • ПОБЕДА ✦</div>
+ <h1>КОД МИЛЛИОНА</h1>
+ <p class="subtitle">Викторина в стиле неонового игрового шоу</p>
+</header>
+<div class="layout">
+ <section class="card main-card">
+  <div class="topline"><div class="pill">ВОПРОС <b id="qNum">1</b> / 15</div><div class="pill">ПРИЗ: <b id="currentPrize">100</b></div></div>
+  <div class="progress"><i id="progress"></i></div>
+  <div class="question-box"><div><div class="q-number" id="category">РАЗМИНКА</div><div class="question" id="question">Готов проверить свои знания?</div></div></div>
+  <div class="answers" id="answers"></div>
+  <div class="action-row">
+   <button class="btn primary" id="lock" disabled>Подтвердить ответ ↗</button>
+   <button class="btn" id="take">Забрать выигрыш</button>
+  </div>
+  <div class="message" id="message">Выбери вариант ответа, затем подтверди его.</div>
+ </section>
+ <aside class="card side">
+  <p class="side-title">Лестница выигрыша</p>
+  <div class="prize-list" id="prizes"></div>
+  <div class="side-controls">
+   <button class="btn lifeline" id="fifty">½  50:50</button>
+   <button class="btn lifeline" id="skip">↪ Пропуск</button>
+   <button class="btn lifeline" id="audience">▥ Голос зала</button>
+  </div>
+  <button class="btn sound" id="music">♫ Музыка: Вкл.</button>
+  <button class="btn sound" id="double">⚡ Испытание ×2</button>
+  <button class="btn sound" id="sfx">♪ Звуки: Вкл.</button>
+  <p class="footer-note">50:50 убирает два неверных варианта. Голос зала показывает подсказку. Испытание ×2 — один очень сложный вопрос: верный ответ удвоит выигрыш, ошибка завершит игру. Это игра на знания — не на реальные деньги.</p>
+ </aside>
+</div>
+</div>
+<div class="overlay" id="challengeOverlay"><div class="modal challenge-modal">
+ <div class="logo">⚡ РЕЖИМ ВЫСОКОГО РИСКА</div>
+ <h2 style="color:#ff76c7">Испытание ×2</h2>
+ <p>Один вопрос повышенной сложности. Правильный ответ удвоит твой выигрыш. Ошибка завершит игру.</p>
+ <div id="challengeQuestion" style="font-size:1.08rem;font-weight:850;line-height:1.4;margin:18px 0"></div>
+ <div id="challengeAnswers" class="challenge-answers"></div>
+ <p id="challengeMessage" aria-live="polite"></p>
+ <button class="btn primary" id="challengeConfirm" disabled>Подтвердить ответ</button>
+ <button class="btn" id="challengeCancel">Отказаться от испытания</button>
+</div></div>
+<style>
+.challenge-modal{border-color:#ff65c877;box-shadow:0 0 55px #d42ba733,0 25px 100px #0009}
+.challenge-answers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.challenge-answers button{border:1px solid #ffffff22;background:#ffffff09;color:white;border-radius:12px;padding:12px 9px;font:inherit;font-weight:700;cursor:pointer}
+.challenge-answers button.chosen{border-color:#55f4e6;background:#55f4e61c}
+.challenge-answers button.correct{background:#1d6543;border-color:#57efaa}
+.challenge-answers button.wrong{background:#8f2450;border-color:#ff4da6}
+#challengeConfirm,#challengeCancel{width:100%;margin-top:8px}
+#double{background:linear-gradient(100deg,#a72d88,#5638c8);border-color:#ff77cf88;color:white}
+#audience{background:linear-gradient(100deg,#087f87,#2854bd);color:white}
+@media(max-width:450px){.challenge-answers{grid-template-columns:1fr}}
+</style>
+<div class="overlay" id="overlay"><div class="modal"><div class="big" id="modalIcon">🏆</div><h2 id="modalTitle">Игра окончена</h2><p id="modalText"></p><button class="btn primary" id="restart">Сыграть ещё раз</button></div></div>
+<script>
+(()=>{
+const questions=[
+{c:'ГЕОГРАФИЯ',q:'Какая страна имеет форму сапога?',a:['Испания','Италия','Греция','Португалия'],ok:1},
+{c:'НАУКА',q:'Какая планета известна как Красная планета?',a:['Венера','Юпитер','Марс','Меркурий'],ok:2},
+{c:'ЛИТЕРАТУРА',q:'Кто написал роман «Робинзон Крузо»?',a:['Даниэль Дефо','Жюль Верн','Марк Твен','Чарльз Диккенс'],ok:0},
+{c:'ЖИВОТНЫЙ МИР',q:'Какое животное является самым крупным на Земле?',a:['Африканский слон','Синий кит','Жираф','Кашалот'],ok:1},
+{c:'МАТЕМАТИКА',q:'Сколько градусов составляет сумма углов треугольника на плоскости?',a:['90°','180°','270°','360°'],ok:1},
+{c:'ИСТОРИЯ',q:'Как назывался древний торговый маршрут между Востоком и Западом?',a:['Путь янтаря','Королевская дорога','Шёлковый путь','Путь специй'],ok:2},
+{c:'КОСМОС',q:'Как называется наша галактика?',a:['Андромеда','Млечный Путь','Сомбреро','Орион'],ok:1},
+{c:'ТЕХНОЛОГИИ',q:'Что означает аббревиатура HTML?',a:['Язык разметки гипертекста','Система передачи файлов','Язык программирования баз данных','Графический формат'],ok:0},
+{c:'МУЗЫКА',q:'Сколько клавиш обычно у полноразмерного фортепиано?',a:['66','76','88','100'],ok:2},
+{c:'ФИЗИКА',q:'Какова приблизительная скорость света в вакууме?',a:['300 000 км/с','30 000 км/с','3 000 км/с','1 500 км/с'],ok:0},
+{c:'МИФОЛОГИЯ',q:'Кто в древнегреческой мифологии был богом моря?',a:['Аполлон','Арес','Посейдон','Гермес'],ok:2},
+{c:'ХИМИЯ',q:'Какой химический символ у золота?',a:['Ag','Au','Fe','Go'],ok:1},
+{c:'ИСКУССТВО',q:'Кто написал картину «Мона Лиза»?',a:['Винсент ван Гог','Пабло Пикассо','Клод Моне','Леонардо да Винчи'],ok:3},
+{c:'БИОЛОГИЯ',q:'Какая часть клетки обычно содержит основную часть ДНК?',a:['Ядро','Рибосома','Мембрана','Цитоплазма'],ok:0},
+{c:'ФИНАЛ',q:'Какое число является простым?',a:['21','27','29','39'],ok:2}
+];
+const hardQuestions=[
+{q:'Какой элемент имеет атомный номер 74?',a:['Вольфрам','Осмий','Тантал','Рений'],ok:0},
+{q:'Кто сформулировал принцип неопределённости в квантовой механике?',a:['Нильс Бор','Эрвин Шрёдингер','Вернер Гейзенберг','Макс Планк'],ok:2},
+{q:'Какой спутник Сатурна обладает плотной азотной атмосферой?',a:['Европа','Титан','Ио','Энцелад'],ok:1},
+{q:'Как называется отношение длины окружности к её диаметру?',a:['Число Эйлера','Золотое сечение','Число пи','Постоянная Планка'],ok:2},
+{q:'Какой из этих языков обычно используют для запросов к реляционным базам данных?',a:['SQL','CSS','XML','Bash'],ok:0},
+{q:'Какое из этих чисел является простым числом Мерсенна?',a:['31','127','341','1023'],ok:1}
+];
+const prizes=[100,200,300,500,1000,2000,4000,8000,16000,32000,64000,125000,250000,500000,1000000];
+let order=[],idx=0,selected=-1,locked=false,won=0,used50=false,usedSkip=false,usedAudience=false,usedDouble=false,challengeSelected=-1,challengeQuestion=null,musicOn=true,sfxOn=true,audio=null,musicTimer=null,musicIndex=0,questionPool=[];
+const $=id=>document.getElementById(id);
+function audioInit(){if(!audio){const C=window.AudioContext||window.webkitAudioContext;if(C)audio=new C()}if(audio?.state==='suspended')audio.resume()}
+function note(freq,dur=.18,type='sine',vol=.035,delay=0){if(!audio||!sfxOn)return;const t=audio.currentTime+delay,o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+dur+.02)}
+function correctSound(){[523,659,784,1046].forEach((f,i)=>note(f,.22,'triangle',.05,i*.09))}
+function wrongSound(){// отдельная драматичная мелодия поражения около 4 секунд
+ if(!audio||!sfxOn)return;const seq=[392,370,330,294,262,233,196,146.83];seq.forEach((f,i)=>note(f,.48,i>5?'sawtooth':'triangle',i>5?.045:.035,i*.47));note(73.42,1.5,'sine',.055,3.1)
+}
+function startMusic(){stopMusic();if(!musicOn)return;audioInit();if(!audio)return;const seq=[130.81,196,261.63,196,146.83,220,293.66,220,110,164.81,220,164.81,123.47,185,246.94,185];musicTimer=setInterval(()=>{if(musicOn&&audio){const f=seq[musicIndex++%seq.length];const t=audio.currentTime,o=audio.createOscillator(),g=audio.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.018,t+.04);g.gain.exponentialRampToValueAtTime(.0001,t+.35);o.connect(g);g.connect(audio.destination);o.start(t);o.stop(t+.37)}},360)}
+function stopMusic(){if(musicTimer)clearInterval(musicTimer);musicTimer=null}
+function renderPrizes(){ $('prizes').innerHTML='';prizes.forEach((p,i)=>{const d=document.createElement('div');d.className='prize'+(i===idx?' current':'')+([4,9,14].includes(i)?' safe':'');d.innerHTML=`<span><span class="step">${String(i+1).padStart(2,'0')}</span>${p.toLocaleString('ru-RU')}</span>${[4,9,14].includes(i)?'<span>◆</span>':''}`;$('prizes').appendChild(d)})}
+function render(){const q=questionPool[idx];selected=-1;locked=false;$('qNum').textContent=idx+1;$('currentPrize').textContent=prizes[idx].toLocaleString('ru-RU');$('progress').style.width=(idx/15*100)+'%';$('category').textContent=q.c;$('question').textContent=q.q;$('answers').innerHTML='';q.a.forEach((a,i)=>{const b=document.createElement('button');b.className='answer';b.innerHTML=`<span class="letter">${'ABCD'[i]}</span><span>${a}</span>`;b.onclick=()=>{if(locked)return;audioInit();selected=i;[...$('answers').children].forEach(x=>x.style.outline='');b.style.outline='2px solid var(--cyan)';$('lock').disabled=false;$('message').textContent='Ответ выбран. Подтверди, когда будешь готов.';note(440,.08,'sine',.025)};$('answers').appendChild(b)});$('lock').disabled=true;$('take').disabled=idx===0&&won===0;$('fifty').disabled=used50;$('skip').disabled=usedSkip;$('audience').disabled=usedAudience;$('double').disabled=usedDouble||won<=0; $('double').textContent=usedDouble?'✓ Испытание использовано':'⚡ Испытание ×2';renderPrizes()}
+function end(title,text,icon='🏆'){stopMusic();$('modalTitle').textContent=title;$('modalText').textContent=text;$('modalIcon').textContent=icon;$('overlay').classList.add('show')}
+function confirmAnswer(){if(selected<0||locked)return;audioInit();locked=true;const q=questionPool[idx],buttons=[...$('answers').children];buttons.forEach(b=>b.disabled=true);buttons[q.ok].classList.add('correct');if(selected!==q.ok){buttons[selected].classList.add('wrong');$('message').textContent='Неверный ответ. Игра окончена.';wrongSound();setTimeout(()=>end('Не в этот раз',`Ты забираешь гарантированный выигрыш: ${safePrize().toLocaleString('ru-RU')}. Попробуй снова!`,'💥'),3900);return}
+ won=prizes[idx];$('message').textContent='Верно! Отличный ответ!';correctSound();$('lock').disabled=true;idx++;renderPrizes();if(idx>=questions.length){$('progress').style.width='100%';setTimeout(()=>end('МИЛЛИОН ТВОЙ!',`Ты ответил на все вопросы и выиграл ${prizes[14].toLocaleString('ru-RU')}!`,'🏆'),750);return}
+ setTimeout(()=>{render();$('message').textContent='Верный ответ! Готов к следующему вопросу?';startMusic()},850)}
+function safePrize(){if(idx>=10)return 32000;if(idx>=5)return 1000;return 0}
+function startDoubleChallenge(){
+ if(usedDouble||won<=0||locked)return;
+ audioInit();usedDouble=true;challengeSelected=-1;challengeQuestion=hardQuestions[Math.floor(Math.random()*hardQuestions.length)];
+ $('challengeQuestion').textContent=challengeQuestion.q;$('challengeMessage').textContent='';$('challengeConfirm').disabled=true;
+ $('challengeAnswers').innerHTML='';challengeQuestion.a.forEach((a,i)=>{const b=document.createElement('button');b.textContent='ABCD'[i]+'. '+a;b.onclick=()=>{challengeSelected=i;[...$('challengeAnswers').children].forEach(x=>x.classList.remove('chosen'));b.classList.add('chosen');$('challengeConfirm').disabled=false};$('challengeAnswers').appendChild(b)});
+ $('challengeOverlay').classList.add('show');$('double').disabled=true;
+}
+function submitDoubleChallenge(){
+ if(challengeSelected<0)return;
+ const correct=challengeSelected===challengeQuestion.ok;
+ [...$('challengeAnswers').children].forEach((b,i)=>{b.disabled=true;if(i===challengeQuestion.ok)b.classList.add('correct');if(i===challengeSelected&&!correct)b.classList.add('wrong')});
+ $('challengeConfirm').disabled=true;$('challengeCancel').disabled=true;
+ if(correct){
+  won=Math.min(1000000,won*2);$('currentPrize').textContent=won.toLocaleString('ru-RU');$('challengeMessage').textContent='Верно! Твой выигрыш удвоен: '+won.toLocaleString('ru-RU')+'!';
+  correctSound();$('double').textContent='✓ Испытание пройдено';
+  setTimeout(()=>{$('challengeOverlay').classList.remove('show');$('challengeCancel').disabled=false;render();$('message').textContent='Испытание пройдено! Выигрыш удвоен.';},1800);
+ }else{
+  $('challengeMessage').textContent='Неверно! Испытание провалено.';wrongSound();
+  setTimeout(()=>{$('challengeOverlay').classList.remove('show');$('challengeCancel').disabled=false;end('Испытание провалено',`Ты завершаешь игру с гарантированным выигрышем ${safePrize().toLocaleString('ru-RU')}.`,'⚡')},3900);
+ }
+}
+function newGame(){stopMusic();idx=0;selected=-1;locked=false;won=0;used50=false;usedSkip=false;usedAudience=false;usedDouble=false;questionPool=questions.map(q=>({...q,a:q.a.slice()}));render();$('message').textContent='Выбери вариант ответа, затем подтверди его.';$('overlay').classList.remove('show');$('challengeOverlay').classList.remove('show');$('double').textContent='⚡ Испытание ×2';startMusic()}
+$('lock').onclick=confirmAnswer;
+$('take').onclick=()=>{if(won<=0){$('message').textContent='Сначала ответь хотя бы на один вопрос.';return}end('Ты забрал выигрыш!',`Твой результат: ${won.toLocaleString('ru-RU')}. Хорошая игра!`,'💎')};
+$('fifty').onclick=()=>{if(used50||locked)return;audioInit();used50=true;const q=questionPool[idx],wrong=[0,1,2,3].filter(i=>i!==q.ok);wrong.sort(()=>Math.random()-.5).slice(0,2).forEach(i=>{const b=$('answers').children[i];b.disabled=true;b.style.visibility='hidden'});$('fifty').disabled=true;$('message').textContent='50:50 активировано — осталось два варианта.';note(620,.16,'triangle',.04)};
+$('skip').onclick=()=>{if(usedSkip||locked)return;audioInit();usedSkip=true;let choices=questions.filter((q,i)=>i!==idx);const replacement=choices[Math.floor(Math.random()*choices.length)];questionPool[idx]={...replacement,a:replacement.a.slice()};$('message').textContent='Вопрос заменён!';render();note(700,.14,'sine',.04)};
+$('audience').onclick=()=>{if(usedAudience||locked)return;audioInit();usedAudience=true;const q=questionPool[idx],correct=q.ok;let vals=[12,12,12,12];vals[correct]=52;let left=48;for(let i=0;i<4;i++)if(i!==correct){let v=Math.floor(Math.random()*(left+1));vals[i]=v;left-=v}const sum=vals.reduce((a,b)=>a+b,0);vals[correct]+=100-sum;$('message').textContent='Голос зала: '+vals.map((v,i)=>'ABCD'[i]+' — '+v+'%').join('  |  ');$('audience').disabled=true;note(500,.12,'triangle',.04)};
+$('double').onclick=startDoubleChallenge;$('challengeConfirm').onclick=submitDoubleChallenge;$('challengeCancel').onclick=()=>{if(!$('challengeOverlay').classList.contains('show'))return;usedDouble=false;$('challengeOverlay').classList.remove('show');$('challengeCancel').disabled=false;render();$('message').textContent='Испытание закрыто. Можешь попробовать позже.'};
+$('music').onclick=()=>{audioInit();musicOn=!musicOn;$('music').textContent='♫ Музыка: '+(musicOn?'Вкл.':'Выкл.');musicOn?startMusic():stopMusic()};
+$('sfx').onclick=()=>{audioInit();sfxOn=!sfxOn;$('sfx').textContent='♪ Звуки: '+(sfxOn?'Вкл.':'Выкл.');if(sfxOn)note(660,.1,'sine',.04)};
+$('restart').onclick=newGame;
+newGame();
+})();
+</script>
+</body>
+</html>
